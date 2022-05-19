@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Audio;
 
 public class SettingsMenu : MonoBehaviour
 {
@@ -13,6 +14,11 @@ public class SettingsMenu : MonoBehaviour
     private int selectedResolution;
 
     public TMP_Text resolutionText;
+
+    public AudioMixer Mixer;
+
+    public TMP_Text masterLabel, musicLabel, sfxLabel;
+    public Slider masterSlider, musicSlider, sfxSlider;
 
     // Start is called before the first frame update
     void Start()
@@ -51,12 +57,13 @@ public class SettingsMenu : MonoBehaviour
             UpdateResolutionLabel();
         }
 
+        VolumeHolder();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        SetVolume();
     }
 
     public void ResolutionLeft()
@@ -101,6 +108,40 @@ public class SettingsMenu : MonoBehaviour
         }
 
         Screen.SetResolution(resolutions[selectedResolution].horizontal, resolutions[selectedResolution].vertical, fsTog.isOn);
+    }
+
+    public void SetVolume()
+    {
+        masterLabel.text = (masterSlider.value + 80).ToString() + "%";
+        musicLabel.text = (musicSlider.value + 80).ToString() + "%";
+        sfxLabel.text = (sfxSlider.value + 80).ToString() + "%";
+
+        Mixer.SetFloat("MasterVol", masterSlider.value);
+        Mixer.SetFloat("MusicVol", musicSlider.value);
+        Mixer.SetFloat("SFXVol", sfxSlider.value);
+
+        PlayerPrefs.SetFloat("MasterVol", masterSlider.value);
+        PlayerPrefs.SetFloat("MusicVol", musicSlider.value);
+        PlayerPrefs.SetFloat("SFXVol", sfxSlider.value);
+
+    }
+
+    public void VolumeHolder()
+    {
+        float volume = 0f;
+
+        Mixer.GetFloat("MasterVol", out volume);
+        masterSlider.value = volume;
+        masterLabel.text = (masterSlider.value + 80).ToString() + "%";
+
+
+        Mixer.GetFloat("MusicVol", out volume);
+        musicSlider.value = volume;
+        musicLabel.text = (musicSlider.value + 80).ToString() + "%";
+
+        Mixer.GetFloat("SFXVol", out volume);
+        sfxSlider.value = volume;
+        sfxLabel.text = (sfxSlider.value + 80).ToString() + "%";
     }
 }
 
